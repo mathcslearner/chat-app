@@ -25,5 +25,5 @@ export const setJwtAuthCookie = ({res, userId}: Cookie) => {
 }
 
 export const clearJwtAuthCookie = (res: Response) => {
-    res.clearCookie("accessToken", {path: "/"})
+    return res.clearCookie("accessToken", {path: "/"})
 }

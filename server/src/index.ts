@@ -9,6 +9,7 @@ import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import connectDatabase from "./config/database.config";
 import "./config/passport.config"
+import routes from "./routes"
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.get("/health",
         })
     })
 )
+
+app.use("/api", routes)
 
 app.use(errorHandler)
 

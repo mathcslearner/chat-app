@@ -12,7 +12,7 @@ export const sendMessageController = asyncHandler(
         const result = await sendMessageService(userId, body)
 
         return res.status(HTTPSTATUS.OK).json({
-            userMessage: "Message sent successfully",
+            message: "Message sent successfully",
             ...result
         })
     }

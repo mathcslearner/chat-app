@@ -1,4 +1,3 @@
-import { useAuth } from "@/hooks/use-auth";
 import { formatChatTime, getOtherUserAndGroup } from "@/lib/helper";
 import { cn } from "@/lib/utils";
 import type { ChatType } from "@/types/chat.type";
@@ -7,14 +6,13 @@ import AvatarWithBadge from "../avatar-with-badge";
 
 interface PropsType {
     chat: ChatType;
+    currentUserId: string | null;
     onClick?: () => void;
 }
 
-const ChatListItem = ({chat, onClick}: PropsType) => {
+const ChatListItem = ({chat, currentUserId, onClick}: PropsType) => {
     const {pathname} = useLocation();
     const {lastMessage, createdAt} = chat;
-    const {user} = useAuth();
-    const currentUserId = user?._id || null;
 
     const {name, avatar, isOnline, isGroup} = getOtherUserAndGroup(chat, currentUserId)
 

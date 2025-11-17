@@ -24,6 +24,7 @@ interface ChatState {
 
     addNewChat: (newChat: ChatType) => void;
     updateChatLastMessage: (chatId: string, lastMessage: MessageType) => void;
+    addNewMessage: (chatId: string, message: MessageType) => void;
 }
 
 export const useChat = create<ChatState>()((set, get) => ({
@@ -75,8 +76,16 @@ export const useChat = create<ChatState>()((set, get) => ({
         }
     },
 
-    fetchSingleChat: async () => {
+    fetchSingleChat: async (chatId: string) => {
         set({isSingleChatLoading: true})
+        try {
+            const {data} = await API.get(`/chat/${chatId}`);
+            set({singleChat: data});
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Failed to fetch chats");
+        } finally {
+            set({isSingleChatLoading: false});
+        }
     },
 
     addNewChat: (newChat: ChatType) => {
@@ -103,5 +112,17 @@ export const useChat = create<ChatState>()((set, get) => ({
                 chats: [{...chat, lastMessage}, ...state.chats.filter((c) => c._id !== chatId)]
             }
         })
+    },
+
+    addNewMessage: (chatId, message) => {
+        const _chat = get().singleChat;
+        if (_chat?.chat._id === chatId) {
+            set({
+                singleChat: {
+                    chat: _chat.chat,
+                    messages: [..._chat.messages, message]
+                }
+            })
+        }
     }
 }))

@@ -1,3 +1,6 @@
+import ChatBody from "@/components/chat/chat-body";
+import ChatHeader from "@/components/chat/chat-header";
+import EmptyState from "@/components/empty-state";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/use-auth";
 import { useChat } from "@/hooks/use-chat";
@@ -17,7 +20,7 @@ const SingleChat = () => {
 
     const currentUserId = user?._id || null;
     const chat = singleChat?.chat;
-    const messages = singleChat?.messages;
+    const messages = singleChat?.messages || [];
 
     useEffect(() => {
         if (!chatId) return;
@@ -55,6 +58,13 @@ const SingleChat = () => {
     return (
         <div className="relative h-svh flex flex-col">
             <div className="flex-1 overflow-y-auto bg-background">
+                <ChatHeader chat={chat} currentUserId={currentUserId} />
+
+                {messages.length === 0 ? (
+                    <EmptyState title="Start a conversation" description="No messages yet. Send the first message" />
+                ) : (
+                    <ChatBody chatId={chatId} messages={messages} onReply={setReplyTo} />
+                )}
 
             </div>
         </div>

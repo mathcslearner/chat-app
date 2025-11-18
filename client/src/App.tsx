@@ -14,10 +14,11 @@ function App() {
   const isAuth = isAuthRoute(pathname);
 
   useEffect(() => {
+    if (isAuth) return;
     isAuthStatus();
   }, [isAuthStatus])
 
-  if (isAuthStatusLoading && !user && !isAuthRoute) {
+  if (isAuthStatusLoading && !user) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <Logo imgClass="size-20" showText={false} />

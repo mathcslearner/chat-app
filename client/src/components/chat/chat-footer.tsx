@@ -9,6 +9,7 @@ import { Paperclip, Send, X } from "lucide-react";
 import { Form, FormField, FormItem } from "../ui/form";
 import { Input } from "../ui/input";
 import ChatReplyBar from "./chat-reply-bar";
+import { useChat } from "@/hooks/use-chat";
 
 interface Props {
     chatId: string | null;
@@ -21,6 +22,8 @@ const ChatFooter = ({chatId, currentUserId, replyTo, onCancelReply}: Props) => {
     const messageSchema = z.object({
         message: z.string().optional()
     })
+
+    const {sendMessage} = useChat();
 
     const [image, setImage] = useState<string | null>(null);
     const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -57,7 +60,7 @@ const ChatFooter = ({chatId, currentUserId, replyTo, onCancelReply}: Props) => {
             return;
         }
 
-        //Send message placeholder
+        sendMessage({chatId, content: values.message, image: image || undefined, replyTo: replyTo})
 
         onCancelReply();
         handleRemoveImage();
@@ -69,9 +72,9 @@ const ChatFooter = ({chatId, currentUserId, replyTo, onCancelReply}: Props) => {
             <div className="sticky bottom-0 inset-x-0 z-[999] bg-card border-t border-border py-4">
                 {image && (
                     <div className = "max-w-6xl mx-auto px-8.5">
-                        <div className="relative">
+                        <div className="relative w-fit">
                             <img src={image} className="object-contain h-16 bg-muted min-w-16" />
-                            <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 bg-black/50 text-white rounded-full"><X className="h-3 w-3"/></Button>
+                            <Button type="button" variant="ghost" size="icon" className="absolute top-px right-1 bg-black/50 text-white rounded-full cursor-pointer" onClick={handleRemoveImage}><X className="h-3 w-3"/></Button>
                         </div>
                     </div>
                 )}

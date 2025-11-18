@@ -89,7 +89,7 @@ export const getSingleChatService = async (chatId: string, userId: string) => {
                 path: "sender",
                 select: "name avatar"
             }
-        }).sort({createdAt: -1})
+        }).sort({createdAt: 1})
 
     return {chat, messages}
 }   

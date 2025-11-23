@@ -82,7 +82,7 @@ export const sendMessageService = async (
         }
     }
 
-    return {userMessage: newMessage, aiResponse, chat, isAIChat: chat.isAIChat}
+    return {userMessage: newMessage, aiResponse, chat}
 }
 
 async function getAIResponse (chatId: string, userId: string) {

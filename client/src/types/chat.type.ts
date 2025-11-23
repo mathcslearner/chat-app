@@ -22,6 +22,7 @@ export type MessageType = {
   createdAt: string;
   updatedAt: string;
   status?: string;
+  streaming?: boolean
 };
 
 export type CreateChatType = {

@@ -6,7 +6,8 @@ import { formatChatTime } from "@/lib/helper";
 import { Button } from "../ui/button";
 import { ReplyIcon } from "lucide-react";
 import { memo } from "react";
-
+import { Response } from "../ui/ai-response";
+import {RiCircleFill} from "@remixicon/react"
 
 interface Props {
     message: MessageType;
@@ -45,8 +46,8 @@ export const ChatMessageBody = memo(({message, onReply}: Props) => {
                         {message.replyTo && (
                             <div className={replyBoxClass}>
                                 <h5 className="font-medium">{replySenderName}</h5>
-                                <p className="font-normal text-muted-foreground">
-                                    {message?.replyTo?.content || message?.replyTo?.image ? "Photo" : ""}
+                                <p className="font-normal text-muted-foreground max-w-[250px] truncate">
+                                    {message?.replyTo?.content || (message?.replyTo?.image ? "Photo" : "")}
                                 </p>
                             </div>
                         )}
@@ -55,7 +56,13 @@ export const ChatMessageBody = memo(({message, onReply}: Props) => {
                             <img src={message?.image || ""} alt="" className="rounded-lg max-w-xs" />
                         )}
 
-                        {message.content && <p>{message.content}</p>}
+                        {message.content && <Response>{message.content}</Response>}
+
+                        {message?.streaming && (
+                            <span>
+                                <RiCircleFill className="w-4 h-4 animate-bounce rounded-full dark:text-white mt-1" />
+                            </span>
+                        )}
                     </div>
                     <Button variant="outline" size="icon" onClick={() => onReply(message)} className="flex opacity-0 group-hover:opacity-100 transition-opacity rounded-full !size-8">
                         <ReplyIcon size={16} className={cn("text-gray-500 dark:text-white !stroke-[1.9]", isCurrentUser && "scale-x-[-1]")} />

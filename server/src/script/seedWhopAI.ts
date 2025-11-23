@@ -3,13 +3,12 @@ import UserModel from "../models/user.model"
 import connectDatabase from "../config/database.config"
 
 export const CreateWhopAI = async () => {
-    let whopAI = await UserModel.findOne({isAI: true})
-    if (whopAI) {
-        console.log("Whop AI already exists")
-        return whopAI
+    const existingAI = await UserModel.findOne({isAI: true})
+    if (existingAI) {
+        await UserModel.deleteOne({_id: existingAI._id})
     }
 
-    whopAI = await UserModel.create({
+    const whopAI = await UserModel.create({
         name: "Whop AI",
         isAI: true,
         avatar: "placeholder"

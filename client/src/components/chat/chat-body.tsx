@@ -1,7 +1,7 @@
 import { useChat } from "@/hooks/use-chat";
 import { useSocket } from "@/hooks/use-socket";
 import type { MessageType } from "@/types/chat.type";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {ChatMessageBody} from "./chat-body-message";
 
 
@@ -13,8 +13,9 @@ interface Props {
 
 const ChatBody = ({chatId, messages, onReply}: Props) => {
     const {socket} = useSocket();
-    const {addNewMessage} = useChat();
+    const {addNewMessage, addOrUpdateMessage} = useChat();
     const bottomRef = useRef<HTMLDivElement | null>(null);
+    const [aiChunk, setAiChunk] = useState<string>("");
 
     useEffect(() => {
         if (!chatId) return;
@@ -30,21 +31,57 @@ const ChatBody = ({chatId, messages, onReply}: Props) => {
     }, [socket, chatId, addNewMessage])
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({behavior: "smooth"})
-    })
+        if (!chatId) return;
+        if (!socket) return;
+
+        const handleAIStream = ({chatId: streamChatId, chunk, done, message}: any) => {
+            if (streamChatId !== chatId) return;
+
+            const lastMsg = messages.at(-1);
+            if (!lastMsg?._id && lastMsg?.streaming) return;
+
+            if (chunk?.trim() && !done) {
+                setAiChunk((prev) => {
+                    const newContent = prev + chunk;
+                    addOrUpdateMessage(
+                        chatId,
+                        {
+                            ...lastMsg,
+                            content: newContent
+                        } as MessageType,
+                        lastMsg?._id
+                    )
+                    return newContent;
+                })
+                return;
+            }
+
+            if (done) {
+                console.log("AI full message:", message)
+                setAiChunk("")
+            }
+        }
+
+        socket.on("chat:ai", handleAIStream)
+
+        return () => {socket.off("chat:ai", handleAIStream)}
+    }, [addOrUpdateMessage, chatId, messages, socket])
+
+    useEffect(() => {
+        if (!messages.length) return;
+
+        const lastMsg = messages[messages.length - 1];
+        const isStreaming = lastMsg?.streaming;
+
+        bottomRef.current?.scrollIntoView({behavior: isStreaming? "auto" : "smooth"})
+    }, [messages])
 
     return(
-        <div className="flex-1 overflow-hidden">
-            <div className="h-auto max-h-screen overflow-y-auto">
-                <div className="w-full max-w-6xl mx-auto h-full flex flex-col px-3">
-                    {messages?.map((message) => (
-                        <ChatMessageBody key={message._id} message={message} onReply={onReply} />
-                    ))}
-                    <br />
-                    <br />
-                    <div ref={bottomRef} />
-                </div>
-            </div>
+        <div className="w-full max-w-6xl mx-auto h-full flex flex-col px-3 py-2">
+            {messages?.map((message) => (
+                <ChatMessageBody key={message._id} message={message} onReply={onReply} />
+            ))}
+            <div ref={bottomRef} />
         </div>
     )
 }

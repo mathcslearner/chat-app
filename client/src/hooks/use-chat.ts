@@ -133,7 +133,7 @@ export const useChat = create<ChatState>()((set, get) => ({
 
             get().addOrUpdateMessage(chatId, userMessage, tempMsgId);
 
-            if (isAIChat && aiSender) {
+            if (isAIChat && aiResponse) {
                 get().addOrUpdateMessage(chatId, aiResponse, tempAIId)
             }
         } catch (error: any) {

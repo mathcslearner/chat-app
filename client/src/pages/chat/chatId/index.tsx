@@ -22,6 +22,7 @@ const SingleChat = () => {
     const currentUserId = user?._id || null;
     const chat = singleChat?.chat;
     const messages = singleChat?.messages || [];
+    const isAIChat = chat?.isAiChat || false;
 
     useEffect(() => {
         if (!chatId) return;
@@ -58,17 +59,16 @@ const SingleChat = () => {
 
     return (
         <div className="relative h-svh flex flex-col">
+            <ChatHeader chat={chat} currentUserId={currentUserId} />
             <div className="flex-1 overflow-y-auto bg-background">
-                <ChatHeader chat={chat} currentUserId={currentUserId} />
-
                 {messages.length === 0 ? (
                     <EmptyState title="Start a conversation" description="No messages yet. Send the first message" />
                 ) : (
                     <ChatBody chatId={chatId} messages={messages} onReply={setReplyTo} />
                 )}
-
-                <ChatFooter replyTo={replyTo} chatId={chatId} currentUserId={currentUserId} onCancelReply={() => setReplyTo(null)} />
             </div>
+
+            <ChatFooter replyTo={replyTo} chatId={chatId} isAIChat = {isAIChat} currentUserId={currentUserId} onCancelReply={() => setReplyTo(null)} />
         </div>
     )
 }

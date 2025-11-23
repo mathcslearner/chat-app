@@ -41,7 +41,7 @@ export const createChatService = async (
 
         const existingChat = await ChatModel.findOne({
             participants: {$all: allParticipantsIds, $size: 2}
-        }).populate("participants", "name avatar")
+        }).populate("participants", "name avatar isAI")
 
         if (existingChat) return existingChat
 
@@ -52,7 +52,7 @@ export const createChatService = async (
         })
     }
 
-    const populatedChat = await chat?.populate("participants", "name avatar")
+    const populatedChat = await chat?.populate("participants", "name avatar isAI")
     const participantIdStrings = populatedChat?.participants?.map((p) => {return p._id?.toString()})
 
     emitNewChatToParticipants(participantIdStrings, populatedChat)
@@ -61,7 +61,7 @@ export const createChatService = async (
 }
 
 export const getUserChatsService = async (userId: string) => {
-    const chats = await ChatModel.find({participants: {$in: [userId]}}).populate("participants", "name avatar")
+    const chats = await ChatModel.find({participants: {$in: [userId]}}).populate("participants", "name avatar isAI")
         .populate({path: "lastMessage", populate: {
             path: "sender",
             select: "name avatar"
@@ -77,17 +77,17 @@ export const getSingleChatService = async (chatId: string, userId: string) => {
         participants: {
             $in: [userId]
         }
-    }).populate("participants", "name avatar")
+    }).populate("participants", "name avatar isAI")
 
     if (!chat) throw new BadRequestException("Chat not found or you are not authorized to view this chat")
 
-    const messages = await MessageModel.find({chatId}).populate("sender", "name avatar")
+    const messages = await MessageModel.find({chatId}).populate("sender", "name avatar isAI")
         .populate({
             path: "replyTo",
             select: "content image sender",
             populate: {
                 path: "sender",
-                select: "name avatar"
+                select: "name avatar isAI"
             }
         }).sort({createdAt: 1})
 
